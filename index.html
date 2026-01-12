@@ -248,16 +248,16 @@
       const dir = directions[entity.dir];
       entity.x = clampPosition(entity.x + dir.x, gridSize);
       entity.y = clampPosition(entity.y + dir.y, gridSize);
-      toggleCell(entity.x, entity.y);
     };
 
-    const moveAndTurn = (entity, nextDir) => {
+    const moveAndSwitchTurnThenMove = (entity, nextDir) => {
       const dir = directions[nextDir];
       entity.x = clampPosition(entity.x + dir.x, gridSize);
       entity.y = clampPosition(entity.y + dir.y, gridSize);
       entity.dir = nextDir;
       const wasGreen = toggleCell(entity.x, entity.y);
       entity.dir = wasGreen ? turnRight(entity.dir) : turnLeft(entity.dir);
+      moveForward(entity);
     };
 
     const directionDistance = (fromDir, toDir) => {
@@ -308,13 +308,11 @@
     };
 
     const stepSimulation = () => {
-      moveForward(mouse);
       const mouseEscapeDir = chooseDirection(mouse, cat, "away");
-      moveAndTurn(mouse, mouseEscapeDir);
+      moveAndSwitchTurnThenMove(mouse, mouseEscapeDir);
 
-      moveForward(cat);
       const catChaseDir = chooseDirection(cat, mouse, "toward");
-      moveAndTurn(cat, catChaseDir);
+      moveAndSwitchTurnThenMove(cat, catChaseDir);
 
       steps += 1;
       stepCountLabel.textContent = steps;
