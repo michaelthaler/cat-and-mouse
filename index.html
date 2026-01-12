@@ -181,6 +181,7 @@
     <canvas id="world" width="800" height="600"></canvas>
     <div class="legend">
       <span><i style="background:rgb(0, 150, 90)"></i>Green cell</span>
+      <span><i style="background:#45d483"></i>Green cell</span>
       <span><i style="background:#ff8a65"></i>Mouse</span>
       <span><i style="background:#64b5f6"></i>Cat</span>
     </div>
@@ -278,6 +279,7 @@
         const nextX = clampPosition(entity.x + candidate.x, gridSize);
         const nextY = clampPosition(entity.y + candidate.y, gridSize);
         const distance = wrappedDistance(nextX, target.x) + wrappedDistance(nextY, target.y);
+        const distance = Math.abs(nextX - target.x) + Math.abs(nextY - target.y);
         if (mode === "toward") {
           if (distance < bestScore) {
             bestScore = distance;
@@ -329,6 +331,7 @@
         for (let x = 0; x < gridSize; x += 1) {
           if (grid[y][x]) {
             ctx.fillStyle = "rgb(0, 150, 90)";
+            ctx.fillStyle = "#45d483";
             ctx.fillRect(x * cellSize, y * cellSize, cellSize, cellSize);
           }
         }
