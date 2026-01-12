@@ -91,6 +91,13 @@
       margin-bottom: 24px;
     }
 
+    .canvas-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 16px;
+      align-items: start;
+    }
+
     canvas {
       display: block;
       background: #f9fafb;
@@ -163,7 +170,7 @@
     </div>
     <div class="panel">
       <label for="speed">Speed (steps/sec)</label>
-      <input id="speed" type="range" min="1" max="100" value="10" />
+      <input id="speed" type="range" min="1" max="500" value="10" />
       <div class="stats">
         <span>Speed: <strong id="speedValue">10</strong></span>
         <span>Steps: <strong id="stepCount">0</strong></span>
@@ -178,7 +185,10 @@
   </section>
 
   <div class="canvas-wrap">
-    <canvas id="world" width="800" height="600"></canvas>
+    <div class="canvas-grid">
+      <canvas id="world" width="800" height="600"></canvas>
+      <canvas id="sphere" width="360" height="360" aria-label="Sphere projection"></canvas>
+    </div>
     <div class="legend">
       <span><i style="background:rgb(0, 100, 60)"></i>Green cell</span>
       <span><i style="background:#ff8a65"></i>Mouse</span>
@@ -200,6 +210,8 @@
     const toggleButton = document.getElementById("toggle");
     const stepButton = document.getElementById("step");
     const resetButton = document.getElementById("reset");
+    const sphereCanvas = document.getElementById("sphere");
+    const sphereCtx = sphereCanvas.getContext("2d");
 
     const directions = [
       { x: 0, y: -1 },
@@ -358,6 +370,97 @@
 
       drawEntity(mouse, "#ff8a65");
       drawEntity(cat, "#64b5f6");
+      drawSphere();
+    };
+
+    const drawSphere = () => {
+      const size = Math.min(sphereCanvas.width, sphereCanvas.height);
+      const centerX = sphereCanvas.width / 2;
+      const centerY = sphereCanvas.height / 2;
+      const radius = size * 0.42;
+
+      sphereCtx.clearRect(0, 0, sphereCanvas.width, sphereCanvas.height);
+      const gradient = sphereCtx.createRadialGradient(
+        centerX - radius * 0.2,
+        centerY - radius * 0.2,
+        radius * 0.2,
+        centerX,
+        centerY,
+        radius
+      );
+      gradient.addColorStop(0, "#f5f8fb");
+      gradient.addColorStop(0.6, "#d7e1ec");
+      gradient.addColorStop(1, "#9fb0c4");
+      sphereCtx.fillStyle = gradient;
+      sphereCtx.beginPath();
+      sphereCtx.arc(centerX, centerY, radius, 0, Math.PI * 2);
+      sphereCtx.fill();
+
+      sphereCtx.save();
+      sphereCtx.beginPath();
+      sphereCtx.arc(centerX, centerY, radius, 0, Math.PI * 2);
+      sphereCtx.clip();
+
+      const drawCellOnSphere = (x, y, color) => {
+        const lon = (x / gridSize) * Math.PI * 2 - Math.PI;
+        const lat = (y / gridSize) * Math.PI - Math.PI / 2;
+        const cosLat = Math.cos(lat);
+        const sx = cosLat * Math.sin(lon);
+        const sy = Math.sin(lat);
+        const sz = cosLat * Math.cos(lon);
+        if (sz <= 0) {
+          return;
+        }
+        const screenX = centerX + sx * radius;
+        const screenY = centerY + sy * radius;
+        const dotSize = Math.max(1, radius / gridSize);
+        sphereCtx.fillStyle = color;
+        sphereCtx.globalAlpha = 0.55 + 0.45 * sz;
+        sphereCtx.beginPath();
+        sphereCtx.arc(screenX, screenY, dotSize, 0, Math.PI * 2);
+        sphereCtx.fill();
+      };
+
+      for (let y = 0; y < gridSize; y += 1) {
+        for (let x = 0; x < gridSize; x += 1) {
+          if (grid[y][x]) {
+            drawCellOnSphere(x + 0.5, y + 0.5, "rgb(0, 100, 60)");
+          }
+        }
+      }
+
+      const drawEntityOnSphere = (entity, color) => {
+        const lon = (entity.x / gridSize) * Math.PI * 2 - Math.PI;
+        const lat = (entity.y / gridSize) * Math.PI - Math.PI / 2;
+        const cosLat = Math.cos(lat);
+        const sx = cosLat * Math.sin(lon);
+        const sy = Math.sin(lat);
+        const sz = cosLat * Math.cos(lon);
+        if (sz <= 0) {
+          return;
+        }
+        sphereCtx.globalAlpha = 0.8 + 0.2 * sz;
+        sphereCtx.fillStyle = color;
+        sphereCtx.beginPath();
+        sphereCtx.arc(
+          centerX + sx * radius,
+          centerY + sy * radius,
+          Math.max(3, radius * 0.04),
+          0,
+          Math.PI * 2
+        );
+        sphereCtx.fill();
+      };
+
+      drawEntityOnSphere(mouse, "#ff8a65");
+      drawEntityOnSphere(cat, "#64b5f6");
+      sphereCtx.restore();
+      sphereCtx.globalAlpha = 1;
+      sphereCtx.strokeStyle = "#1c232d";
+      sphereCtx.lineWidth = 2;
+      sphereCtx.beginPath();
+      sphereCtx.arc(centerX, centerY, radius, 0, Math.PI * 2);
+      sphereCtx.stroke();
     };
 
     const resizeCanvas = () => {
