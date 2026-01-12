@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Cat and Mouse Life Simulation</title>
+  <style>
+    :root {
+      color-scheme: light dark;
+      font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    body {
+      margin: 0;
+      background: #101418;
+      color: #e6edf3;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+    }
+
+    header {
+      padding: 24px 16px 8px;
+      text-align: center;
+    }
+
+    h1 {
+      margin: 0 0 8px;
+      font-size: 1.6rem;
+    }
+
+    p {
+      margin: 0;
+      color: #9fb0c4;
+    }
+
+    .controls {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 12px;
+      width: min(900px, 92vw);
+      margin: 16px auto 8px;
+    }
+
+    .panel {
+      background: #161c23;
+      padding: 12px;
+      border-radius: 10px;
+      border: 1px solid #222a33;
+    }
+
+    label {
+      display: block;
+      font-size: 0.85rem;
+      margin-bottom: 6px;
+      color: #a9b7c6;
+    }
+
+    input, select, button {
+      width: 100%;
+      padding: 6px 8px;
+      border-radius: 6px;
+      border: 1px solid #2c3844;
+      background: #0f141a;
+      color: inherit;
+      font-size: 0.9rem;
+    }
+
+    button {
+      cursor: pointer;
+      background: #2b6cb0;
+      border: none;
+      font-weight: 600;
+    }
+
+    button.secondary {
+      background: #3a414a;
+    }
+
+    button:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    .canvas-wrap {
+      background: #0b0f14;
+      border: 1px solid #1c232d;
+      border-radius: 14px;
+      padding: 12px;
+      margin-bottom: 24px;
+    }
+
+    canvas {
+      display: block;
+      background: #f9fafb;
+      border-radius: 8px;
+    }
+
+    .stats {
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      margin-top: 8px;
+      font-size: 0.85rem;
+      color: #b4c1d4;
+    }
+
+    .legend {
+      display: flex;
+      gap: 12px;
+      font-size: 0.8rem;
+      margin-top: 8px;
+      color: #a7b2c2;
+    }
+
+    .legend span {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .legend i {
+      width: 12px;
+      height: 12px;
+      border-radius: 3px;
+      display: inline-block;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Cat and Mouse Artificial Life</h1>
+    <p>Inspired by Langton's Ant with a two-move mouse and a chasing cat.</p>
+  </header>
+
+  <section class="controls">
+    <div class="panel">
+      <label for="gridSize">Grid size (cells)</label>
+      <input id="gridSize" type="number" min="20" max="200" value="80" />
+    </div>
+    <div class="panel">
+      <label for="mousePosition">Mouse position (x,y)</label>
+      <input id="mousePosition" type="text" value="20,40" />
+      <label for="mouseDirection">Mouse direction</label>
+      <select id="mouseDirection">
+        <option value="0">North</option>
+        <option value="1" selected>East</option>
+        <option value="2">South</option>
+        <option value="3">West</option>
+      </select>
+    </div>
+    <div class="panel">
+      <label for="catPosition">Cat position (x,y)</label>
+      <input id="catPosition" type="text" value="60,40" />
+      <label for="catDirection">Cat direction</label>
+      <select id="catDirection">
+        <option value="0">North</option>
+        <option value="1">East</option>
+        <option value="2" selected>South</option>
+        <option value="3">West</option>
+      </select>
+    </div>
+    <div class="panel">
+      <label for="speed">Speed (steps/sec)</label>
+      <input id="speed" type="range" min="1" max="30" value="10" />
+      <div class="stats">
+        <span>Speed: <strong id="speedValue">10</strong></span>
+        <span>Steps: <strong id="stepCount">0</strong></span>
+      </div>
+    </div>
+    <div class="panel">
+      <label>&nbsp;</label>
+      <button id="toggle">Start</button>
+      <button id="step" class="secondary" style="margin-top: 8px;">Step once</button>
+      <button id="reset" class="secondary" style="margin-top: 8px;">Reset</button>
+    </div>
+  </section>
+
+  <div class="canvas-wrap">
+    <canvas id="world" width="800" height="600"></canvas>
+    <div class="legend">
+      <span><i style="background:#45d483"></i>Green cell</span>
+      <span><i style="background:#ff8a65"></i>Mouse</span>
+      <span><i style="background:#64b5f6"></i>Cat</span>
+    </div>
+  </div>
+
+  <script>
+    const canvas = document.getElementById("world");
+    const ctx = canvas.getContext("2d");
+    const gridSizeInput = document.getElementById("gridSize");
+    const mousePositionInput = document.getElementById("mousePosition");
+    const mouseDirectionInput = document.getElementById("mouseDirection");
+    const catPositionInput = document.getElementById("catPosition");
+    const catDirectionInput = document.getElementById("catDirection");
+    const speedInput = document.getElementById("speed");
+    const speedValue = document.getElementById("speedValue");
+    const stepCountLabel = document.getElementById("stepCount");
+    const toggleButton = document.getElementById("toggle");
+    const stepButton = document.getElementById("step");
+    const resetButton = document.getElementById("reset");
+
+    const directions = [
+      { x: 0, y: -1 },
+      { x: 1, y: 0 },
+      { x: 0, y: 1 },
+      { x: -1, y: 0 }
+    ];
+
+    let grid = [];
+    let gridSize = 80;
+    let cellSize = 10;
+    let steps = 0;
+    let timerId = null;
+
+    const mouse = { x: 0, y: 0, dir: 1 };
+    const cat = { x: 0, y: 0, dir: 2 };
+
+    const clampPosition = (value, size) => (value + size) % size;
+
+    const parsePosition = (value) => {
+      const parts = value.split(",").map((part) => Number.parseInt(part.trim(), 10));
+      if (parts.length !== 2 || parts.some(Number.isNaN)) {
+        return null;
+      }
+      return { x: parts[0], y: parts[1] };
+    };
+
+    const resetGrid = () => {
+      grid = Array.from({ length: gridSize }, () =>
+        Array.from({ length: gridSize }, () => false)
+      );
+      steps = 0;
+      stepCountLabel.textContent = steps;
+    };
+
+    const toggleCell = (x, y) => {
+      const wasGreen = grid[y][x];
+      grid[y][x] = !wasGreen;
+      return wasGreen;
+    };
+
+    const turnLeft = (dir) => (dir + 3) % 4;
+    const turnRight = (dir) => (dir + 1) % 4;
+
+    const moveForward = (entity) => {
+      const dir = directions[entity.dir];
+      entity.x = clampPosition(entity.x + dir.x, gridSize);
+      entity.y = clampPosition(entity.y + dir.y, gridSize);
+      toggleCell(entity.x, entity.y);
+    };
+
+    const moveAndTurn = (entity, nextDir) => {
+      const dir = directions[nextDir];
+      entity.x = clampPosition(entity.x + dir.x, gridSize);
+      entity.y = clampPosition(entity.y + dir.y, gridSize);
+      entity.dir = nextDir;
+      const wasGreen = toggleCell(entity.x, entity.y);
+      entity.dir = wasGreen ? turnRight(entity.dir) : turnLeft(entity.dir);
+    };
+
+    const directionDistance = (fromDir, toDir) => {
+      const diff = Math.abs(fromDir - toDir) % 4;
+      return Math.min(diff, 4 - diff);
+    };
+
+    const chooseDirection = (entity, target, mode) => {
+      let bestDirs = [];
+      let bestScore = mode === "toward" ? Number.POSITIVE_INFINITY : Number.NEGATIVE_INFINITY;
+      for (let i = 0; i < directions.length; i += 1) {
+        const candidate = directions[i];
+        const nextX = clampPosition(entity.x + candidate.x, gridSize);
+        const nextY = clampPosition(entity.y + candidate.y, gridSize);
+        const distance = Math.abs(nextX - target.x) + Math.abs(nextY - target.y);
+        if (mode === "toward") {
+          if (distance < bestScore) {
+            bestScore = distance;
+            bestDirs = [i];
+          } else if (distance === bestScore) {
+            bestDirs.push(i);
+          }
+        } else {
+          if (distance > bestScore) {
+            bestScore = distance;
+            bestDirs = [i];
+          } else if (distance === bestScore) {
+            bestDirs.push(i);
+          }
+        }
+      }
+
+      let chosen = bestDirs[0];
+      let bestTurn = directionDistance(entity.dir, chosen);
+      bestDirs.forEach((dir) => {
+        const turn = directionDistance(entity.dir, dir);
+        if (turn < bestTurn) {
+          bestTurn = turn;
+          chosen = dir;
+        }
+      });
+      return chosen;
+    };
+
+    const stepSimulation = () => {
+      moveForward(mouse);
+      const mouseEscapeDir = chooseDirection(mouse, cat, "away");
+      moveAndTurn(mouse, mouseEscapeDir);
+
+      moveForward(cat);
+      const catChaseDir = chooseDirection(cat, mouse, "toward");
+      moveAndTurn(cat, catChaseDir);
+
+      steps += 1;
+      stepCountLabel.textContent = steps;
+      draw();
+    };
+
+    const draw = () => {
+      ctx.fillStyle = "#f9fafb";
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      for (let y = 0; y < gridSize; y += 1) {
+        for (let x = 0; x < gridSize; x += 1) {
+          if (grid[y][x]) {
+            ctx.fillStyle = "#45d483";
+            ctx.fillRect(x * cellSize, y * cellSize, cellSize, cellSize);
+          }
+        }
+      }
+
+      const drawEntity = (entity, color) => {
+        ctx.fillStyle = color;
+        ctx.beginPath();
+        ctx.arc(
+          entity.x * cellSize + cellSize / 2,
+          entity.y * cellSize + cellSize / 2,
+          cellSize * 0.35,
+          0,
+          Math.PI * 2
+        );
+        ctx.fill();
+
+        const dir = directions[entity.dir];
+        ctx.strokeStyle = "#0b0f14";
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.moveTo(entity.x * cellSize + cellSize / 2, entity.y * cellSize + cellSize / 2);
+        ctx.lineTo(
+          entity.x * cellSize + cellSize / 2 + dir.x * cellSize * 0.35,
+          entity.y * cellSize + cellSize / 2 + dir.y * cellSize * 0.35
+        );
+        ctx.stroke();
+      };
+
+      drawEntity(mouse, "#ff8a65");
+      drawEntity(cat, "#64b5f6");
+    };
+
+    const resizeCanvas = () => {
+      gridSize = Number.parseInt(gridSizeInput.value, 10) || 80;
+      gridSize = Math.min(Math.max(gridSize, 20), 200);
+      gridSizeInput.value = gridSize;
+      cellSize = Math.floor(Math.min(800 / gridSize, 600 / gridSize));
+      canvas.width = gridSize * cellSize;
+      canvas.height = gridSize * cellSize;
+    };
+
+    const applySettings = () => {
+      const mousePos = parsePosition(mousePositionInput.value) || { x: 20, y: 40 };
+      const catPos = parsePosition(catPositionInput.value) || { x: 60, y: 40 };
+
+      mouse.x = clampPosition(mousePos.x, gridSize);
+      mouse.y = clampPosition(mousePos.y, gridSize);
+      mouse.dir = Number.parseInt(mouseDirectionInput.value, 10) || 0;
+
+      cat.x = clampPosition(catPos.x, gridSize);
+      cat.y = clampPosition(catPos.y, gridSize);
+      cat.dir = Number.parseInt(catDirectionInput.value, 10) || 0;
+    };
+
+    const resetSimulation = () => {
+      resizeCanvas();
+      resetGrid();
+      applySettings();
+      draw();
+    };
+
+    const updateSpeed = () => {
+      speedValue.textContent = speedInput.value;
+      if (timerId) {
+        clearInterval(timerId);
+        timerId = setInterval(stepSimulation, 1000 / Number(speedInput.value));
+      }
+    };
+
+    toggleButton.addEventListener("click", () => {
+      if (timerId) {
+        clearInterval(timerId);
+        timerId = null;
+        toggleButton.textContent = "Start";
+      } else {
+        timerId = setInterval(stepSimulation, 1000 / Number(speedInput.value));
+        toggleButton.textContent = "Pause";
+      }
+    });
+
+    stepButton.addEventListener("click", () => {
+      if (!timerId) {
+        stepSimulation();
+      }
+    });
+
+    resetButton.addEventListener("click", () => {
+      resetSimulation();
+      if (timerId) {
+        clearInterval(timerId);
+        timerId = null;
+        toggleButton.textContent = "Start";
+      }
+    });
+
+    speedInput.addEventListener("input", updateSpeed);
+
+    resetSimulation();
+  </script>
+</body>
+</html>
