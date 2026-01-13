@@ -3,532 +3,203 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Cat and Mouse Life Simulation</title>
+  <title>Profile</title>
   <style>
     :root {
-      color-scheme: light dark;
+      color-scheme: light;
       font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+      background: #f5f7fb;
+      color: #1f2733;
+    }
+
+    * {
+      box-sizing: border-box;
     }
 
     body {
       margin: 0;
-      background: #101418;
-      color: #e6edf3;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
       min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      padding: 32px 16px;
+      background: #f5f7fb;
     }
 
-    header {
-      padding: 24px 16px 8px;
+    .layout {
+      width: min(1100px, 100%);
+      display: grid;
+      grid-template-columns: 280px 1fr;
+      gap: 24px;
+    }
+
+    aside {
+      background: #0c243c;
+      color: #f0f4f8;
+      border-radius: 18px;
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .profile-photo {
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #f7c59f, #f4d35e);
+      border: 4px solid rgba(255, 255, 255, 0.25);
+      align-self: center;
+    }
+
+    .sidebar-title {
+      margin: 0;
+      font-size: 1.3rem;
       text-align: center;
     }
 
-    h1 {
-      margin: 0 0 8px;
-      font-size: 1.6rem;
-    }
-
-    p {
+    .sidebar-role {
       margin: 0;
-      color: #9fb0c4;
+      font-size: 0.95rem;
+      color: #cfe0f5;
+      text-align: center;
     }
 
-    .controls {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-      gap: 12px;
-      width: min(900px, 92vw);
-      margin: 16px auto 8px;
-    }
-
-    .panel {
-      background: #161c23;
-      padding: 12px;
-      border-radius: 10px;
-      border: 1px solid #222a33;
-    }
-
-    label {
-      display: block;
-      font-size: 0.85rem;
-      margin-bottom: 6px;
-      color: #a9b7c6;
-    }
-
-    input, select, button {
-      width: 100%;
-      padding: 6px 8px;
-      border-radius: 6px;
-      border: 1px solid #2c3844;
-      background: #0f141a;
-      color: inherit;
-      font-size: 0.9rem;
-    }
-
-    button {
-      cursor: pointer;
-      background: #2b6cb0;
-      border: none;
+    .sidebar-affiliation {
+      margin: 0;
+      font-size: 0.95rem;
       font-weight: 600;
+      text-align: center;
+      color: #f7e7b1;
     }
 
-    button.secondary {
-      background: #3a414a;
+    .follow-button {
+      padding: 10px 14px;
+      border-radius: 999px;
+      border: none;
+      background: #f26b38;
+      color: #fff;
+      font-weight: 600;
+      cursor: pointer;
     }
 
-    button:disabled {
-      opacity: 0.6;
-      cursor: not-allowed;
-    }
-
-    .canvas-wrap {
-      background: #0b0f14;
-      border: 1px solid #1c232d;
-      border-radius: 14px;
-      padding: 12px;
-      margin-bottom: 24px;
-    }
-
-    .canvas-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-      gap: 16px;
-      align-items: start;
-    }
-
-    canvas {
-      display: block;
-      background: #f9fafb;
-      border-radius: 8px;
-    }
-
-    .stats {
+    .sidebar-links {
       display: flex;
-      justify-content: space-between;
-      gap: 16px;
-      margin-top: 8px;
-      font-size: 0.85rem;
-      color: #b4c1d4;
+      flex-wrap: wrap;
+      gap: 10px;
+      justify-content: center;
     }
 
-    .legend {
-      display: flex;
-      gap: 12px;
-      font-size: 0.8rem;
-      margin-top: 8px;
-      color: #a7b2c2;
-    }
-
-    .legend span {
+    .sidebar-links a {
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      background: #173552;
       display: inline-flex;
       align-items: center;
-      gap: 6px;
+      justify-content: center;
+      color: #f0f4f8;
+      text-decoration: none;
     }
 
-    .legend i {
-      width: 12px;
-      height: 12px;
-      border-radius: 3px;
-      display: inline-block;
+    .sidebar-links svg {
+      width: 18px;
+      height: 18px;
+      fill: currentColor;
+    }
+
+    main {
+      background: #ffffff;
+      border-radius: 18px;
+      padding: 32px;
+      box-shadow: 0 18px 40px rgba(12, 36, 60, 0.1);
+    }
+
+    main h2 {
+      margin-top: 0;
+      font-size: 1.5rem;
+    }
+
+    .main-text {
+      font-size: 0.95rem;
+      line-height: 1.7;
+      color: #334155;
+    }
+
+    .main-text p {
+      margin: 0 0 16px;
+    }
+
+    @media (orientation: portrait) {
+      body {
+        padding: 20px 12px;
+      }
+
+      .layout {
+        grid-template-columns: 1fr;
+      }
+
+      aside {
+        align-items: center;
+      }
+
+      .profile-photo {
+        width: 150px;
+        height: 150px;
+      }
+
+      .follow-button {
+        display: none;
+      }
+
+      .sidebar-links {
+        margin-top: 4px;
+      }
     }
   </style>
 </head>
 <body>
-  <header>
-    <h1>Cat and Mouse Artificial Life</h1>
-    <p>Inspired by Langton's Ant with a two-move mouse and a chasing cat.</p>
-  </header>
-
-  <section class="controls">
-    <div class="panel">
-      <label for="gridSize">Grid size (cells)</label>
-      <input id="gridSize" type="number" min="20" max="200" value="80" />
-    </div>
-    <div class="panel">
-      <label for="mousePosition">Mouse position (x,y)</label>
-      <input id="mousePosition" type="text" value="20,40" />
-      <label for="mouseDirection">Mouse direction</label>
-      <select id="mouseDirection">
-        <option value="0">North</option>
-        <option value="1" selected>East</option>
-        <option value="2">South</option>
-        <option value="3">West</option>
-      </select>
-    </div>
-    <div class="panel">
-      <label for="catPosition">Cat position (x,y)</label>
-      <input id="catPosition" type="text" value="60,40" />
-      <label for="catDirection">Cat direction</label>
-      <select id="catDirection">
-        <option value="0">North</option>
-        <option value="1">East</option>
-        <option value="2" selected>South</option>
-        <option value="3">West</option>
-      </select>
-    </div>
-    <div class="panel">
-      <label for="speed">Speed (steps/sec)</label>
-      <input id="speed" type="range" min="1" max="500" value="10" />
-      <div class="stats">
-        <span>Speed: <strong id="speedValue">10</strong></span>
-        <span>Steps: <strong id="stepCount">0</strong></span>
+  <div class="layout">
+    <aside>
+      <div class="profile-photo" aria-hidden="true"></div>
+      <h1 class="sidebar-title">Dr. Cat Mouse</h1>
+      <p class="sidebar-role">Behavio(u)ral economist at UCL</p>
+      <p class="sidebar-affiliation">UCL</p>
+      <button class="follow-button" type="button">Follow</button>
+      <div class="sidebar-links" aria-label="Contact links">
+        <a href="mailto:example@ucl.ac.uk" aria-label="Email">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M4 6h16a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2zm0 2v.01L12 13l8-4.99V8H4z" />
+          </svg>
+        </a>
+        <a href="https://scholar.google.com" aria-label="Google Scholar">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M12 3 1 9l11 6 9-4.91V17h2V9L12 3zm-1 13.47L4.24 13 11 9.53 17.76 13 11 16.47z" />
+          </svg>
+        </a>
+        <a href="https://www.linkedin.com" aria-label="LinkedIn">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M6.94 8.5H3.5V20h3.44V8.5zM5.22 4a1.72 1.72 0 1 0 0 3.44A1.72 1.72 0 0 0 5.22 4zM20.5 13.3c0-3.26-1.74-4.78-4.06-4.78-1.87 0-2.71 1.03-3.18 1.76v-1.5H9.8c.05.99 0 11.22 0 11.22h3.45v-6.27c0-.34.03-.67.12-.91.27-.67.88-1.36 1.92-1.36 1.35 0 1.9 1.03 1.9 2.54V20h3.46v-6.7z" />
+          </svg>
+        </a>
       </div>
-    </div>
-    <div class="panel">
-      <label>&nbsp;</label>
-      <button id="toggle">Start</button>
-      <button id="step" class="secondary" style="margin-top: 8px;">Step once</button>
-      <button id="reset" class="secondary" style="margin-top: 8px;">Reset</button>
-    </div>
-  </section>
-
-  <div class="canvas-wrap">
-    <div class="canvas-grid">
-      <canvas id="world" width="800" height="600"></canvas>
-      <canvas id="sphere" width="360" height="360" aria-label="Sphere projection"></canvas>
-    </div>
-    <div class="legend">
-      <span><i style="background:rgb(0, 100, 60)"></i>Green cell</span>
-      <span><i style="background:#ff8a65"></i>Mouse</span>
-      <span><i style="background:#64b5f6"></i>Cat</span>
-    </div>
+    </aside>
+    <main>
+      <h2>Research Overview</h2>
+      <div class="main-text">
+        <p>
+          I study how people make decisions under uncertainty, using experimental and field
+          methods to understand consumer choice, incentive design, and policy communication.
+        </p>
+        <p>
+          My work bridges behavioral science and applied economics, with a focus on translating
+          evidence into practical recommendations for institutions and public services.
+        </p>
+        <p>
+          Current projects explore decision-making in digital marketplaces, climate policy
+          engagement, and the role of trust in economic interactions.
+        </p>
+      </div>
+    </main>
   </div>
-
-  <script>
-    const canvas = document.getElementById("world");
-    const ctx = canvas.getContext("2d");
-    const gridSizeInput = document.getElementById("gridSize");
-    const mousePositionInput = document.getElementById("mousePosition");
-    const mouseDirectionInput = document.getElementById("mouseDirection");
-    const catPositionInput = document.getElementById("catPosition");
-    const catDirectionInput = document.getElementById("catDirection");
-    const speedInput = document.getElementById("speed");
-    const speedValue = document.getElementById("speedValue");
-    const stepCountLabel = document.getElementById("stepCount");
-    const toggleButton = document.getElementById("toggle");
-    const stepButton = document.getElementById("step");
-    const resetButton = document.getElementById("reset");
-    const sphereCanvas = document.getElementById("sphere");
-    const sphereCtx = sphereCanvas.getContext("2d");
-
-    const directions = [
-      { x: 0, y: -1 },
-      { x: 1, y: 0 },
-      { x: 0, y: 1 },
-      { x: -1, y: 0 }
-    ];
-
-    let grid = [];
-    let gridSize = 80;
-    let cellSize = 10;
-    let steps = 0;
-    let timerId = null;
-
-    const mouse = { x: 0, y: 0, dir: 1 };
-    const cat = { x: 0, y: 0, dir: 2 };
-
-    const clampPosition = (value, size) => (value + size) % size;
-
-    const parsePosition = (value) => {
-      const parts = value.split(",").map((part) => Number.parseInt(part.trim(), 10));
-      if (parts.length !== 2 || parts.some(Number.isNaN)) {
-        return null;
-      }
-      return { x: parts[0], y: parts[1] };
-    };
-
-    const resetGrid = () => {
-      grid = Array.from({ length: gridSize }, () =>
-        Array.from({ length: gridSize }, () => false)
-      );
-      steps = 0;
-      stepCountLabel.textContent = steps;
-    };
-
-    const toggleCell = (x, y) => {
-      const wasGreen = grid[y][x];
-      grid[y][x] = !wasGreen;
-      return wasGreen;
-    };
-
-    const turnLeft = (dir) => (dir + 3) % 4;
-    const turnRight = (dir) => (dir + 1) % 4;
-
-    const moveForward = (entity) => {
-      const dir = directions[entity.dir];
-      entity.x = clampPosition(entity.x + dir.x, gridSize);
-      entity.y = clampPosition(entity.y + dir.y, gridSize);
-    };
-
-    const moveAndSwitchTurnThenMove = (entity, nextDir) => {
-      const dir = directions[nextDir];
-      entity.x = clampPosition(entity.x + dir.x, gridSize);
-      entity.y = clampPosition(entity.y + dir.y, gridSize);
-      entity.dir = nextDir;
-      const wasGreen = toggleCell(entity.x, entity.y);
-      entity.dir = wasGreen ? turnRight(entity.dir) : turnLeft(entity.dir);
-      moveForward(entity);
-    };
-
-    const directionDistance = (fromDir, toDir) => {
-      const diff = Math.abs(fromDir - toDir) % 4;
-      return Math.min(diff, 4 - diff);
-    };
-
-    const wrappedDistance = (a, b) => {
-      const raw = Math.abs(a - b);
-      return Math.min(raw, gridSize - raw);
-    };
-
-    const chooseDirection = (entity, target, mode) => {
-      let bestDirs = [];
-      let bestScore = mode === "toward" ? Number.POSITIVE_INFINITY : Number.NEGATIVE_INFINITY;
-      for (let i = 0; i < directions.length; i += 1) {
-        const candidate = directions[i];
-        const nextX = clampPosition(entity.x + candidate.x, gridSize);
-        const nextY = clampPosition(entity.y + candidate.y, gridSize);
-        const distance = wrappedDistance(nextX, target.x) + wrappedDistance(nextY, target.y);
-        if (mode === "toward") {
-          if (distance < bestScore) {
-            bestScore = distance;
-            bestDirs = [i];
-          } else if (distance === bestScore) {
-            bestDirs.push(i);
-          }
-        } else {
-          if (distance > bestScore) {
-            bestScore = distance;
-            bestDirs = [i];
-          } else if (distance === bestScore) {
-            bestDirs.push(i);
-          }
-        }
-      }
-
-      let chosen = bestDirs[0];
-      let bestTurn = directionDistance(entity.dir, chosen);
-      bestDirs.forEach((dir) => {
-        const turn = directionDistance(entity.dir, dir);
-        if (turn < bestTurn) {
-          bestTurn = turn;
-          chosen = dir;
-        }
-      });
-      return chosen;
-    };
-
-    const stepSimulation = () => {
-      const mouseEscapeDir = chooseDirection(mouse, cat, "away");
-      moveAndSwitchTurnThenMove(mouse, mouseEscapeDir);
-
-      const catChaseDir = chooseDirection(cat, mouse, "toward");
-      moveAndSwitchTurnThenMove(cat, catChaseDir);
-
-      steps += 1;
-      stepCountLabel.textContent = steps;
-      draw();
-    };
-
-    const draw = () => {
-      ctx.fillStyle = "#f9fafb";
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-      for (let y = 0; y < gridSize; y += 1) {
-        for (let x = 0; x < gridSize; x += 1) {
-          if (grid[y][x]) {
-            ctx.fillStyle = "rgb(0, 100, 60)";
-            ctx.fillRect(x * cellSize, y * cellSize, cellSize, cellSize);
-          }
-        }
-      }
-
-      const drawEntity = (entity, color) => {
-        ctx.fillStyle = color;
-        ctx.beginPath();
-        ctx.arc(
-          entity.x * cellSize + cellSize / 2,
-          entity.y * cellSize + cellSize / 2,
-          cellSize * 0.35,
-          0,
-          Math.PI * 2
-        );
-        ctx.fill();
-
-        const dir = directions[entity.dir];
-        ctx.strokeStyle = "#0b0f14";
-        ctx.lineWidth = 2;
-        ctx.beginPath();
-        ctx.moveTo(entity.x * cellSize + cellSize / 2, entity.y * cellSize + cellSize / 2);
-        ctx.lineTo(
-          entity.x * cellSize + cellSize / 2 + dir.x * cellSize * 0.35,
-          entity.y * cellSize + cellSize / 2 + dir.y * cellSize * 0.35
-        );
-        ctx.stroke();
-      };
-
-      drawEntity(mouse, "#ff8a65");
-      drawEntity(cat, "#64b5f6");
-      drawSphere();
-    };
-
-    const drawSphere = () => {
-      const size = Math.min(sphereCanvas.width, sphereCanvas.height);
-      const centerX = sphereCanvas.width / 2;
-      const centerY = sphereCanvas.height / 2;
-      const radius = size * 0.42;
-
-      sphereCtx.clearRect(0, 0, sphereCanvas.width, sphereCanvas.height);
-      const gradient = sphereCtx.createRadialGradient(
-        centerX - radius * 0.2,
-        centerY - radius * 0.2,
-        radius * 0.2,
-        centerX,
-        centerY,
-        radius
-      );
-      gradient.addColorStop(0, "#f5f8fb");
-      gradient.addColorStop(0.6, "#d7e1ec");
-      gradient.addColorStop(1, "#9fb0c4");
-      sphereCtx.fillStyle = gradient;
-      sphereCtx.beginPath();
-      sphereCtx.arc(centerX, centerY, radius, 0, Math.PI * 2);
-      sphereCtx.fill();
-
-      sphereCtx.save();
-      sphereCtx.beginPath();
-      sphereCtx.arc(centerX, centerY, radius, 0, Math.PI * 2);
-      sphereCtx.clip();
-
-      const drawCellOnSphere = (x, y, color) => {
-        const lon = (x / gridSize) * Math.PI * 2 - Math.PI;
-        const lat = (y / gridSize) * Math.PI - Math.PI / 2;
-        const cosLat = Math.cos(lat);
-        const sx = cosLat * Math.sin(lon);
-        const sy = Math.sin(lat);
-        const sz = cosLat * Math.cos(lon);
-        if (sz <= 0) {
-          return;
-        }
-        const screenX = centerX + sx * radius;
-        const screenY = centerY + sy * radius;
-        const dotSize = Math.max(1, radius / gridSize);
-        sphereCtx.fillStyle = color;
-        sphereCtx.globalAlpha = 0.55 + 0.45 * sz;
-        sphereCtx.beginPath();
-        sphereCtx.arc(screenX, screenY, dotSize, 0, Math.PI * 2);
-        sphereCtx.fill();
-      };
-
-      for (let y = 0; y < gridSize; y += 1) {
-        for (let x = 0; x < gridSize; x += 1) {
-          if (grid[y][x]) {
-            drawCellOnSphere(x + 0.5, y + 0.5, "rgb(0, 100, 60)");
-          }
-        }
-      }
-
-      const drawEntityOnSphere = (entity, color) => {
-        const lon = (entity.x / gridSize) * Math.PI * 2 - Math.PI;
-        const lat = (entity.y / gridSize) * Math.PI - Math.PI / 2;
-        const cosLat = Math.cos(lat);
-        const sx = cosLat * Math.sin(lon);
-        const sy = Math.sin(lat);
-        const sz = cosLat * Math.cos(lon);
-        if (sz <= 0) {
-          return;
-        }
-        sphereCtx.globalAlpha = 0.8 + 0.2 * sz;
-        sphereCtx.fillStyle = color;
-        sphereCtx.beginPath();
-        sphereCtx.arc(
-          centerX + sx * radius,
-          centerY + sy * radius,
-          Math.max(3, radius * 0.04),
-          0,
-          Math.PI * 2
-        );
-        sphereCtx.fill();
-      };
-
-      drawEntityOnSphere(mouse, "#ff8a65");
-      drawEntityOnSphere(cat, "#64b5f6");
-      sphereCtx.restore();
-      sphereCtx.globalAlpha = 1;
-      sphereCtx.strokeStyle = "#1c232d";
-      sphereCtx.lineWidth = 2;
-      sphereCtx.beginPath();
-      sphereCtx.arc(centerX, centerY, radius, 0, Math.PI * 2);
-      sphereCtx.stroke();
-    };
-
-    const resizeCanvas = () => {
-      gridSize = Number.parseInt(gridSizeInput.value, 10) || 80;
-      gridSize = Math.min(Math.max(gridSize, 20), 200);
-      gridSizeInput.value = gridSize;
-      cellSize = Math.floor(Math.min(800 / gridSize, 600 / gridSize));
-      canvas.width = gridSize * cellSize;
-      canvas.height = gridSize * cellSize;
-    };
-
-    const applySettings = () => {
-      const mousePos = parsePosition(mousePositionInput.value) || { x: 20, y: 40 };
-      const catPos = parsePosition(catPositionInput.value) || { x: 60, y: 40 };
-
-      mouse.x = clampPosition(mousePos.x, gridSize);
-      mouse.y = clampPosition(mousePos.y, gridSize);
-      mouse.dir = Number.parseInt(mouseDirectionInput.value, 10) || 0;
-
-      cat.x = clampPosition(catPos.x, gridSize);
-      cat.y = clampPosition(catPos.y, gridSize);
-      cat.dir = Number.parseInt(catDirectionInput.value, 10) || 0;
-    };
-
-    const resetSimulation = () => {
-      resizeCanvas();
-      resetGrid();
-      applySettings();
-      draw();
-    };
-
-    const updateSpeed = () => {
-      speedValue.textContent = speedInput.value;
-      if (timerId) {
-        clearInterval(timerId);
-        timerId = setInterval(stepSimulation, 1000 / Number(speedInput.value));
-      }
-    };
-
-    toggleButton.addEventListener("click", () => {
-      if (timerId) {
-        clearInterval(timerId);
-        timerId = null;
-        toggleButton.textContent = "Start";
-      } else {
-        timerId = setInterval(stepSimulation, 1000 / Number(speedInput.value));
-        toggleButton.textContent = "Pause";
-      }
-    });
-
-    stepButton.addEventListener("click", () => {
-      if (!timerId) {
-        stepSimulation();
-      }
-    });
-
-    resetButton.addEventListener("click", () => {
-      resetSimulation();
-      if (timerId) {
-        clearInterval(timerId);
-        timerId = null;
-        toggleButton.textContent = "Start";
-      }
-    });
-
-    speedInput.addEventListener("input", updateSpeed);
-
-    resetSimulation();
-  </script>
 </body>
 </html>
